@@ -1,64 +1,135 @@
-package com.example.myapplication // Kendi paket adın olduğundan emin ol
+package com.example.myapplication
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.toColorInt
+import androidx.core.graphics.toColorInt // Renk uyarısını çözen import
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
+
+    private var suAnkiKategori = "Genel"
+    // İnternetten gelen sözleri burada tutacağız
+    private var tumSozler = mutableListOf<SozModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. Arayüz elemanlarını bağlıyoruz (ID'lerin XML ile birebir aynı olması gerekir)
+        // Arayüz elemanları
         val metinAlani = findViewById<TextView>(R.id.sozMetni)
         val degistirButonu = findViewById<Button>(R.id.sozDegistirButon)
         val anaLayout = findViewById<LinearLayout>(R.id.anaLayout)
         val paylasButon = findViewById<Button>(R.id.paylasButon)
+        val kopyalaButon = findViewById<Button>(R.id.kopyalaButon)
 
-        // 2. Söz listemiz
-        val sozler = listOf(
-            "Gelecek, bugünden hazırlananlara aittir.",
-            "Batan güneş için ağlama; yeniden doğduğunda ne yapacağına karar ver.",
-            "Zorluklar, başarının değerini artıran süslerdir.",
-            "Yarınlar yorgun ve bezgin kimselere değil, rahatını terk edebilen gayretli kişilere aittir.",
-            "Sadece çok uzağa gitme riskini göze alanlar, ne kadar uzağa gidebileceğini bilir.",
-            "Karanlığa küfretmektense bir mum yakmak daha iyidir.",
-            "Başarı, başarısızlıktan başarısızlığa, hevesini kaybetmeden gitmektir.",
-            "Uçamazsan koş, koşamazsan yürü, yürüyemezsen sürün ama ne yaparsan yap ilerlemeye devam et.",
-            "Dağı yerinden oynatan, küçük taşları taşımakla başlar.",
-            "Hayatın %10'u başına gelenler, %90'ı ise onlara nasıl tepki verdiğindir."
-        )
+        val btnGenel = findViewById<Button>(R.id.btnGenel)
+        val btnSpor = findViewById<Button>(R.id.btnSpor)
+        val btnBasari = findViewById<Button>(R.id.btnBasari)
 
-        // 3. Değiştir Butonu tıklandığında yapılacak işlemler
-        degistirButonu.setOnClickListener {
-            // Sözü değiştir
-            val rastgeleSoz = sozler.random()
-            metinAlani.text = rastgeleSoz // HATA BURADAYDI: metinAlani olarak düzelttik
+        // 1. Fonksiyon: Sözü ve Rengi Güncelleme
+        fun sozuGuncelle() {
+            // Filtreleme: İnternetten gelenler boşsa sabit bir yazı göster
+            val secilenListe = tumSozler.filter { it.kategori == suAnkiKategori }
 
-            // Gözü yormayan pastel renk listesi
-            val pastelRenkler = listOf(
-                "#FFD1DC", "#FFECB3", "#B2DFDB", "#E1BEE7", "#C8E6C9", "#BBDEFB", "#F5F5F5"
-            )
-
-            // Listeden rastgele bir renk seç ve uygula
-            val secilenRenk = pastelRenkler.random().toColorInt()
-            anaLayout.setBackgroundColor(secilenRenk)
-        }
-
-        // 4. Paylaş Butonu tıklandığında yapılacak işlemler
-        paylasButon.setOnClickListener {
-            val mesaj = metinAlani.text.toString()
-            val intent = Intent().apply {
-                action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, mesaj)
-                type = "text/plain"
+            if (secilenListe.isNotEmpty()) {
+                metinAlani.text = secilenListe.random().icerik
+            } else {
+                metinAlani.text = "Sözler yükleniyor veya bu kategoride söz yok..."
             }
-            startActivity(Intent.createChooser(intent, "Şununla paylaş:"))
+
+            val pastelRenkler = listOf("#FFD1DC", "#FFECB3", "#B2DFDB", "#E1BEE7", "#C8E6C9")
+            anaLayout.setBackgroundColor(pastelRenkler.random().toColorInt())
         }
+
+        // 2. Fonksiyon: Buton Renklerini Güncelleme
+        fun butonRenkleriniGuncelle(secilenButon: Button, digerButonlar: List<Button>) {
+            secilenButon.setBackgroundColor(Color.parseColor("#6200EE"))
+            secilenButon.setTextColor(Color.WHITE)
+            for (buton in digerButonlar) {
+                buton.setBackgroundColor(Color.LTGRAY)
+                buton.setTextColor(Color.BLACK)
+            }
+        }
+
+        // 3. Fonksiyon: İnternetten Veri Çekme (Hata Aldığın Yer Burasıydı!)
+        fun internettenSozleriCek() {
+            RetrofitClient.instance.sozleriGetir().enqueue(object : Callback<List<SozModel>> {
+                override fun onResponse(call: Call<List<SozModel>>, response: Response<List<SozModel>> ) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body != null) {
+                            println("Gelen veri sayısı: ${body.size}")
+                            tumSozler.clear()
+                            tumSozler.addAll(body)
+                            sozuGuncelle()
+                        } else {
+                            println("Body boş geldi!")
+                        }
+                    } else {
+                        println("Hata Kodu: ${response.code()}")
+                    }
+                    println("Gelen veri sayısı: ${response.body()?.size}")
+                }
+
+                override fun onFailure(call: Call<List<SozModel>>, t: Throwable) {
+                    // Hatanın gerçek sebebini Logcat'e yazdırıyoruz
+                    println("Retrofit Hatası: ${t.localizedMessage}")
+
+                    // Yedek sözleri yükle
+                    tumSozler.add(SozModel("Genel", "Hata olsa da denemeye devam et!"))
+                    sozuGuncelle()
+                }
+            })
+        }
+
+        // --- TIKLAMA OLAYLARI ---
+        btnGenel.setOnClickListener {
+            suAnkiKategori = "Genel"
+            sozuGuncelle()
+            butonRenkleriniGuncelle(btnGenel, listOf(btnSpor, btnBasari))
+        }
+
+        btnSpor.setOnClickListener {
+            suAnkiKategori = "Spor"
+            sozuGuncelle()
+            butonRenkleriniGuncelle(btnSpor, listOf(btnGenel, btnBasari))
+        }
+
+        btnBasari.setOnClickListener {
+            suAnkiKategori = "Başarı"
+            sozuGuncelle()
+            butonRenkleriniGuncelle(btnBasari, listOf(btnGenel, btnSpor))
+        }
+
+        degistirButonu.setOnClickListener { sozuGuncelle() }
+
+        paylasButon.setOnClickListener {
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/plain"
+            intent.putExtra(Intent.EXTRA_TEXT, metinAlani.text.toString())
+            startActivity(Intent.createChooser(intent, "Paylaş"))
+        }
+
+        kopyalaButon.setOnClickListener {
+            val pano = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val veri = ClipData.newPlainText("Söz", metinAlani.text.toString())
+            pano.setPrimaryClip(veri)
+            Toast.makeText(this, "Kopyalandı!", Toast.LENGTH_SHORT).show()
+        }
+
+        // UYGULAMA AÇILIŞINDA ÇALIŞACAKLAR
+        internettenSozleriCek()
+        butonRenkleriniGuncelle(btnGenel, listOf(btnSpor, btnBasari))
     }
 }

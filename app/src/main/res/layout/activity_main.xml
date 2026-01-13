@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/anaKapsayici"
+    android:id="@+id/anaLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
     android:padding="24dp">
+
+    <LinearLayout
+        android:id="@+id/ustButonlar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_alignParentTop="true">
+
+        <Button
+            android:id="@+id/paylasButon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Paylaş"
+            android:layout_marginEnd="5dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+        <Button
+            android:id="@+id/kopyalaButon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Kopyala"
+            android:layout_marginStart="5dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+    </LinearLayout>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/anaKart"
@@ -20,20 +47,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:id="@+id/anaLayout"
-            android:padding="32dp">
+            android:padding="16dp">
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button android:id="@+id/btnGenel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Genel" android:layout_marginEnd="8dp"/>
+                    <Button android:id="@+id/btnSpor" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Spor" android:layout_marginEnd="8dp"/>
+                    <Button android:id="@+id/btnBasari" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Başarı" android:layout_marginEnd="8dp"/>
+                    <Button android:id="@+id/btnMotivasyon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Motivasyon" />
+                </LinearLayout>
+            </HorizontalScrollView>
 
             <TextView
                 android:id="@+id/sozMetni"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/baslangic_metni"
-                android:textSize="26sp"
-                android:textStyle="bold"
+                android:gravity="center"
+                android:text="Sözler yükleniyor..."
                 android:textColor="#333333"
-                android:textAlignment="center"
-                android:layout_marginBottom="30dp"
-                android:padding="10dp"/>
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:padding="20dp" />
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -42,17 +86,10 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="20dp"
         android:backgroundTint="#6200EE"
-        android:text="@string/beni_motive_et"
+        android:text="Beni Motive Et!"
         android:textColor="#FFFFFF"
         app:cornerRadius="12dp" />
-    <Button
-        android:id="@+id/paylasButon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/bu_sozu_paylas"
-        android:layout_marginTop="10dp"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
 </RelativeLayout>
