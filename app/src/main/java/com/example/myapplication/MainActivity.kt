@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             )
 
             // Listeden rastgele bir renk seç ve uygula
-            val secilenRenk = Color.parseColor(pastelRenkler.random())
+            val secilenRenk = pastelRenkler.random().toColorInt()
             anaLayout.setBackgroundColor(secilenRenk)
         }
 

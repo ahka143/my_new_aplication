@@ -27,7 +27,7 @@
                 android:id="@+id/sozMetni"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Başlamak için butona bas!"
+                android:text="@string/baslangic_metni"
                 android:textSize="26sp"
                 android:textStyle="bold"
                 android:textColor="#333333"
@@ -44,14 +44,14 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="40dp"
         android:backgroundTint="#6200EE"
-        android:text="Beni Motive Et!"
+        android:text="@string/beni_motive_et"
         android:textColor="#FFFFFF"
         app:cornerRadius="12dp" />
     <Button
         android:id="@+id/paylasButon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bu Sözü Paylaş"
+        android:text="@string/bu_sozu_paylas"
         android:layout_marginTop="10dp"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
