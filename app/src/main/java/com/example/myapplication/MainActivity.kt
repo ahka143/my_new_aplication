@@ -1,14 +1,12 @@
-package com.example.myapplication // <-- Burası senin projenin adı olmalı
+package com.example.myapplication // Kendi paket adın olduğundan emin ol
 
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,12 +14,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. Arayüz elemanlarını bağlıyoruz
-        val anaKapsayici = findViewById<View>(R.id.anaKapsayici) // Az önce verdiğimiz ID
+        // 1. Arayüz elemanlarını bağlıyoruz (ID'lerin XML ile birebir aynı olması gerekir)
         val metinAlani = findViewById<TextView>(R.id.sozMetni)
         val degistirButonu = findViewById<Button>(R.id.sozDegistirButon)
         val anaLayout = findViewById<LinearLayout>(R.id.anaLayout)
         val paylasButon = findViewById<Button>(R.id.paylasButon)
+
         // 2. Söz listemiz
         val sozler = listOf(
             "Gelecek, bugünden hazırlananlara aittir.",
@@ -36,24 +34,30 @@ class MainActivity : AppCompatActivity() {
             "Hayatın %10'u başına gelenler, %90'ı ise onlara nasıl tepki verdiğindir."
         )
 
-        // 3. Buton tıklandığında yapılacak işlemler
+        // 3. Değiştir Butonu tıklandığında yapılacak işlemler
         degistirButonu.setOnClickListener {
-            // 1. Sözü değiştir
-            metinAlani.text = sozler.random()
+            // Sözü değiştir
+            val rastgeleSoz = sozler.random()
+            metinAlani.text = rastgeleSoz // HATA BURADAYDI: metinAlani olarak düzelttik
 
-            // 2. Rastgele açık bir renk oluştur
-            val renk = Color.argb(255, Random.nextInt(256), Random.nextInt(256), Random.nextInt(256))
-            anaLayout.setBackgroundColor(renk)
+            // Gözü yormayan pastel renk listesi
+            val pastelRenkler = listOf(
+                "#FFD1DC", "#FFECB3", "#B2DFDB", "#E1BEE7", "#C8E6C9", "#BBDEFB", "#F5F5F5"
+            )
 
-            // 3. Arka planı boya (Kritik nokta burası)
-            anaKapsayici.setBackgroundColor(renk)
+            // Listeden rastgele bir renk seç ve uygula
+            val secilenRenk = Color.parseColor(pastelRenkler.random())
+            anaLayout.setBackgroundColor(secilenRenk)
         }
+
+        // 4. Paylaş Butonu tıklandığında yapılacak işlemler
         paylasButon.setOnClickListener {
             val mesaj = metinAlani.text.toString()
-            val intent = Intent()
-            intent.action = Intent.ACTION_SEND
-            intent.putExtra(Intent.EXTRA_TEXT, mesaj)
-            intent.type = "text/plain"
+            val intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, mesaj)
+                type = "text/plain"
+            }
             startActivity(Intent.createChooser(intent, "Şununla paylaş:"))
         }
     }
