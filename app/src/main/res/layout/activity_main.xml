@@ -25,14 +25,15 @@
 
             <TextView
                 android:id="@+id/sozMetni"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hazır mısın?"
+                android:text="Başlamak için butona bas!"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
                 android:textAlignment="center"
-                android:textColor="#212121"
-                android:textSize="24sp"
-                android:lineSpacingExtra="8dp"
-                android:textStyle="bold|italic" />
+                android:layout_marginBottom="30dp"
+                android:padding="10dp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
