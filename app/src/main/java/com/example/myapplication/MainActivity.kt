@@ -7,11 +7,11 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
-import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.toColorInt // Renk uyarısını çözen import
+import androidx.core.graphics.toColorInt
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,7 +19,6 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
 
     private var suAnkiKategori = "Genel"
-    // İnternetten gelen sözleri burada tutacağız
     private var tumSozler = mutableListOf<SozModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,17 +28,16 @@ class MainActivity : AppCompatActivity() {
         // Arayüz elemanları
         val metinAlani = findViewById<TextView>(R.id.sozMetni)
         val degistirButonu = findViewById<Button>(R.id.sozDegistirButon)
-        val anaLayout = findViewById<LinearLayout>(R.id.anaLayout)
+        val anaLayout = findViewById<RelativeLayout>(R.id.anaLayout) // RelativeLayout olarak düzelttik
         val paylasButon = findViewById<Button>(R.id.paylasButon)
         val kopyalaButon = findViewById<Button>(R.id.kopyalaButon)
 
         val btnGenel = findViewById<Button>(R.id.btnGenel)
         val btnSpor = findViewById<Button>(R.id.btnSpor)
         val btnBasari = findViewById<Button>(R.id.btnBasari)
+        val btnMotivasyon = findViewById<Button>(R.id.btnMotivasyon)
 
-        // 1. Fonksiyon: Sözü ve Rengi Güncelleme
         fun sozuGuncelle() {
-            // Filtreleme: İnternetten gelenler boşsa sabit bir yazı göster
             val secilenListe = tumSozler.filter { it.kategori == suAnkiKategori }
 
             if (secilenListe.isNotEmpty()) {
@@ -52,7 +50,6 @@ class MainActivity : AppCompatActivity() {
             anaLayout.setBackgroundColor(pastelRenkler.random().toColorInt())
         }
 
-        // 2. Fonksiyon: Buton Renklerini Güncelleme
         fun butonRenkleriniGuncelle(secilenButon: Button, digerButonlar: List<Button>) {
             secilenButon.setBackgroundColor(Color.parseColor("#6200EE"))
             secilenButon.setTextColor(Color.WHITE)
@@ -62,54 +59,50 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 3. Fonksiyon: İnternetten Veri Çekme (Hata Aldığın Yer Burasıydı!)
         fun internettenSozleriCek() {
             RetrofitClient.instance.sozleriGetir().enqueue(object : Callback<List<SozModel>> {
-                override fun onResponse(call: Call<List<SozModel>>, response: Response<List<SozModel>> ) {
+                override fun onResponse(call: Call<List<SozModel>>, response: Response<List<SozModel>>) {
                     if (response.isSuccessful) {
-                        val body = response.body()
-                        if (body != null) {
-                            println("Gelen veri sayısı: ${body.size}")
+                        response.body()?.let {
                             tumSozler.clear()
-                            tumSozler.addAll(body)
+                            tumSozler.addAll(it)
                             sozuGuncelle()
-                        } else {
-                            println("Body boş geldi!")
                         }
-                    } else {
-                        println("Hata Kodu: ${response.code()}")
                     }
-                    println("Gelen veri sayısı: ${response.body()?.size}")
                 }
 
                 override fun onFailure(call: Call<List<SozModel>>, t: Throwable) {
-                    // Hatanın gerçek sebebini Logcat'e yazdırıyoruz
-                    println("Retrofit Hatası: ${t.localizedMessage}")
-
-                    // Yedek sözleri yükle
-                    tumSozler.add(SozModel("Genel", "Hata olsa da denemeye devam et!"))
+                    tumSozler.add(SozModel("Genel", "Bağlantı hatası, denemeye devam et!"))
                     sozuGuncelle()
                 }
             })
         }
 
-        // --- TIKLAMA OLAYLARI ---
+        // Tıklama Olayları
+        val tumKategoriler = listOf(btnGenel, btnSpor, btnBasari, btnMotivasyon)
+
         btnGenel.setOnClickListener {
             suAnkiKategori = "Genel"
             sozuGuncelle()
-            butonRenkleriniGuncelle(btnGenel, listOf(btnSpor, btnBasari))
+            butonRenkleriniGuncelle(btnGenel, tumKategoriler.filter { it != btnGenel })
         }
 
         btnSpor.setOnClickListener {
             suAnkiKategori = "Spor"
             sozuGuncelle()
-            butonRenkleriniGuncelle(btnSpor, listOf(btnGenel, btnBasari))
+            butonRenkleriniGuncelle(btnSpor, tumKategoriler.filter { it != btnSpor })
         }
 
         btnBasari.setOnClickListener {
             suAnkiKategori = "Başarı"
             sozuGuncelle()
-            butonRenkleriniGuncelle(btnBasari, listOf(btnGenel, btnSpor))
+            butonRenkleriniGuncelle(btnBasari, tumKategoriler.filter { it != btnBasari })
+        }
+
+        btnMotivasyon.setOnClickListener {
+            suAnkiKategori = "Motivasyon"
+            sozuGuncelle()
+            butonRenkleriniGuncelle(btnMotivasyon, tumKategoriler.filter { it != btnMotivasyon })
         }
 
         degistirButonu.setOnClickListener { sozuGuncelle() }
@@ -128,8 +121,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Kopyalandı!", Toast.LENGTH_SHORT).show()
         }
 
-        // UYGULAMA AÇILIŞINDA ÇALIŞACAKLAR
         internettenSozleriCek()
-        butonRenkleriniGuncelle(btnGenel, listOf(btnSpor, btnBasari))
+        butonRenkleriniGuncelle(btnGenel, tumKategoriler.filter { it != btnGenel })
     }
 }

@@ -77,7 +77,6 @@
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:padding="20dp" />
-
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
